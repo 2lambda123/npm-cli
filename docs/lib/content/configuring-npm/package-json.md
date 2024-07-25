@@ -146,7 +146,7 @@ Then include a file named `<filename>` at the top level of the package.
 Some old packages used license objects or a "licenses" property containing
 an array of license objects:
 
-```json
+```jsonc
 // Not valid metadata
 {
   "license" : {
@@ -545,11 +545,9 @@ same shortcut syntax you use for `npm install`:
 }
 ```
 
-If the `package.json` for your package is not in the root directory (for
-example if it is part of a monorepo), you can specify the directory in
-which it lives:
-
-```json
+If your `package.json` isn't in the root directory, common with monorepos like Facebook's React, you can specify its location. i.e. `react-dom`:
+```jsonc
+/* @/packages/react-dom/package.json */
 {
   "repository": {
     "type": "git",
@@ -557,6 +555,12 @@ which it lives:
     "directory": "workspaces/libnpmpublish"
   }
 }
+```
+```txt
+react.git/
+└── packages/
+    └── react-dom/
+        └── package.json
 ```
 
 ### scripts
@@ -1017,7 +1021,7 @@ this limitation easier to deal with, overrides may also be defined as a
 reference to a spec for a direct dependency by prefixing the name of the
 package you wish the version to match with a `$`.
 
-```json
+```jsonc
 {
   "dependencies": {
     "foo": "^1.0.0"
