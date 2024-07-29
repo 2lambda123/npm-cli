@@ -351,6 +351,76 @@ not much else.
 
 If `main` is not set, it defaults to `index.js` in the package's root folder.
 
+### exports
+
+The exports field is an object that maps entry points to modules. This field is
+only supported by modern Node.js versions. It acts as a more featureful
+alternative to the main field. Each key can be an explicit path for mapping
+entry points to modules 1 to 1, or it can include a wild card (`*`) for mapping
+multiple entry points that fit the wild card to corrosponding modules.
+
+Each value in the exports field object can be an array of entry point string
+where each path will be iterated through and the first path that leads to a
+module will be used. The value also does not necessarily need to map to a
+JavaScript module, it can also map to a JSON file.
+
+For example, you could have:
+
+```json
+{
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*.js",
+    "./*.js": "./*.js",
+    "./foo": "./path/to/foo.js",
+    "./package.json": "./package.json",
+    "./baz": [ "./try-here.js", "./then-try-here.js" ]
+  }
+}
+```
+
+If someone installed your package with this in your `package.json`, they could
+`require("my-package")` and it would be mapped to
+`./node_modules/my-package/index.js` because of `".": "./index.js"`.<br>
+If they did `require("my-package/bar")` or `require("my-package/bar.js")`, it
+would be mapped to `./node_modules/my-package/bar.js` because of the wild cards
+(`*`).<br>
+If they did `require("my-package/foo")` it would be mapped to
+`./node_modules/my-package/path/to/foo.js` because of the explicit mapping
+`"./foo": "./path/to/foo.js"`.
+
+The exports field also supports conditional exports, which will use a different
+object to resolve entry points to modules depending on if the consumer of your
+package is using CommonJS `require()` calls or ESM `import`
+statements/expressions.
+
+Here is an example of conditional exports:
+
+```json
+  "exports": {
+    "require": {
+      ".": "./index.cjs",
+      "./*": "./*.cjs",
+      "./*.js": "./*.cjs",
+      "./foo": "./path/to/foo.cjs",
+      "./package.json": "./package.json",
+      "./baz": [ "./try-here.cjs", "./then-try-here.cjs" ]
+    },
+    "import": {
+      ".": "./index.js",
+      "./*": "./*.js",
+      "./*.js": "./*.js",
+      "./foo": "./path/to/foo.js",
+      "./package.json": "./package.json",
+      "./baz": [ "./try-here.js", "./then-try-here.js" ]
+    }
+  }
+```
+
+More information on the exports field can be found
+[on the Node.js Docs](https://nodejs.org/docs/latest/api/packages.html#package-entry-points)
+.
+
 ### browser
 
 If your module is meant to be used client-side the browser field should be
